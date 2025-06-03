@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'makeai' => [
+        'url' => env('MAKE_WEBHOOK_URL'),
+    ]
+
 ];
