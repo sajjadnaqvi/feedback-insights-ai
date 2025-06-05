@@ -37,6 +37,10 @@ return [
 
     'makeai' => [
         'url' => env('MAKE_WEBHOOK_URL'),
+    ],
+
+    'webhook' => [
+        'secret' => env('WEBHOOK_SECRET'),
     ]
 
 ];
