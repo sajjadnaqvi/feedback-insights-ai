@@ -139,6 +139,9 @@ When a user submits feedback through the Laravel app, the feedback is stored and
    - Confirm that sentiment is analyzed and updated in your database.
 
 -----
+<img width="596" alt="Screenshot 2025-06-10 145820" src="https://github.com/user-attachments/assets/5ae14612-67a9-475d-a191-dfe059ad98e5" /></br></br>
+<img width="482" alt="Screenshot 2025-06-10 151246" src="https://github.com/user-attachments/assets/fca18d7a-56d7-40df-a88b-e5960835027f" /></br></br>
+<img width="443" alt="Screenshot 2025-06-10 151032" src="https://github.com/user-attachments/assets/aff929fe-100d-46ee-b678-c001e7f64fe0" />
 
 ## Usage
 
