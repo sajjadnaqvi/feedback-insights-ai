@@ -1,61 +1,169 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# AI-Driven Sentiment Analysis for Laravel Feedback
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This project demonstrates a real-time sentiment analysis workflow for user feedback in a Laravel application, using **Make.com** and the **Hugging Face Inference API**.
 
-## About Laravel
+-----
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Project Overview
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+When a user submits feedback through the Laravel app, the feedback is stored and a queued job sends the comment to Make.com via webhook. Make.com uses a Hugging Face sentiment analysis model to classify the sentiment (positive/negative/neutral) and calls back a secure Laravel webhook to update the feedback record. Admins can view all feedback and sentiment in a dashboard.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+-----
 
-## Learning Laravel
+## Key Technologies
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- **Laravel:** PHP framework for feedback forms, authentication, and database management.
+- **Make.com:** No-code automation platform for workflow orchestration.
+- **Hugging Face Inference API:** Provides pre-trained AI models for sentiment analysis.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+-----
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Features
 
-## Laravel Sponsors
+- **User Authentication:** Register/login system for users.
+- **Feedback Submission:** Authenticated users can submit feedback.
+- **Queued Sentiment Analysis:** Feedback is analyzed asynchronously for scalability.
+- **Webhook Integration:** Secure, token-protected webhook for Make.com to update sentiment.
+- **Admin Dashboard:** Admins can view all feedbacks and their sentiment.
+- **Extensible:** Easily swap AI models or add analytics.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+-----
 
-### Premium Partners
+## Setup and Installation
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 1. Laravel Application Setup
+
+**Prerequisites:** PHP, Composer, Laravel, and a database (MySQL recommended).
+
+1. **Clone the repository:**
+    ```bash
+    git clone [your-repo-link]
+    cd [your-repo-name]
+    ```
+2. **Install dependencies:**
+    ```bash
+    composer install
+    ```
+3. **Copy `.env.example` to `.env` and configure:**
+    ```bash
+    cp .env.example .env
+    ```
+    - Set your database credentials.
+    - Add your Make.com webhook URL:
+      ```
+      MAKEAI_URL="https://hook.make.com/your-make-webhook"
+      ```
+    - Add a secret for webhook security:
+      ```
+      WEBHOOK_SECRET=your_secure_token
+      ```
+4. **Generate application key:**
+    ```bash
+    php artisan key:generate
+    ```
+5. **Run migrations:**
+    ```bash
+    php artisan migrate
+    ```
+6. **Start the Laravel server:**
+    ```bash
+    php artisan serve
+    ```
+
+-----
+
+## Make.com and Hugging Face Integration
+
+### Prerequisites
+
+- **Make.com Account:** Sign up at [Make.com](https://www.make.com/).
+- **Hugging Face Account:** Sign up at [Hugging Face](https://huggingface.co/).
+- **Hugging Face API Token (Recommended):** Generate a token at [Hugging Face Tokens](https://huggingface.co/settings/tokens) for higher rate limits.
+
+### Make.com Scenario Setup
+
+1. **Create a New Scenario:**
+   - In your Make.com dashboard, click "Create a new scenario".
+
+2. **Add Your Trigger Module:**
+   - Add the **Webhook** module as the trigger.
+   - Configure the webhook to receive data from your Laravel application (the feedback comment).
+
+3. **Add the HTTP Module for Sentiment Analysis:**
+   - Click the "+" button next to your trigger module.
+   - Search for and select the **HTTP** app.
+   - Choose the **Make a request** module.
+
+4. **Configure the HTTP Request to Hugging Face:**
+   - **URL:**  
+     ```
+     https://api-inference.huggingface.co/models/bert-base-uncased-finetuned-sst-2-english
+     ```
+     (You can use other models, e.g., `distilbert-base-uncased-finetuned-sst-2-english`.)
+   - **Method:** `POST`
+   - **Headers:**
+     - `Content-Type: application/json`
+     - `Authorization: Bearer YOUR_HUGGINGFACE_API_TOKEN` (replace with your token, optional but recommended)
+   - **Body type:** Raw
+   - **Request content:**  
+     ```json
+     {
+       "inputs": "{{1.body.comment}}"
+     }
+     ```
+     *(Assuming your webhook module is the first module in the scenario. Adjust the `1` if it's a different number.)*
+
+5. **Send Sentiment Data Back to Laravel:**
+   - Add another **HTTP** module.
+   - Configure it to POST the sentiment result to your Laravel webhook endpoint:
+     - **URL:**  
+       ```
+       http://127.0.0.1:8000/api/webhook/sentiment
+       ```
+     - **Headers:**
+       - `X-Webhook-Token: your_secure_token`
+       - `Content-Type: application/json`
+     - **Body:**  
+       ```json
+       {
+            "data":{
+                "feedback_id": "{{1.body.feedback_id}}",
+                "sentiments": {{2.data}}
+            }
+       }
+       ```
+       *(Adjust the mapping as needed based on your scenario's module order.)*
+
+8. **Test the Scenario:**
+   - Submit feedback in your Laravel app.
+   - Confirm that sentiment is analyzed and updated in your database.
+
+-----
+
+## Usage
+
+1. Users register/login and submit feedback.
+2. Feedback is stored and a job sends it to Make.com for sentiment analysis.
+3. Make.com analyzes the sentiment using Hugging Face and calls back your Laravel webhook.
+4. The feedback record is updated with the sentiment.
+5. Admins can view all feedback and sentiment in the dashboard.
+
+-----
+
+## Security
+
+- Webhook endpoints are protected with a secret token (`X-Webhook-Token`).
+- Only authenticated users can submit feedback.
+- Admin dashboard is protected by middleware.
+
+-----
 
 ## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Feel free to fork this project, open issues, or submit pull requests.
 
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+-----
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-sourced under the MIT License.
