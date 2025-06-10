@@ -134,7 +134,7 @@ When a user submits feedback through the Laravel app, the feedback is stored and
        ```
        *(Adjust the mapping as needed based on your scenario's module order.)*
 
-8. **Test the Scenario:**
+6. **Test the Scenario:**
    - Submit feedback in your Laravel app.
    - Confirm that sentiment is analyzed and updated in your database.
 
