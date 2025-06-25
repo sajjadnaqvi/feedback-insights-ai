@@ -1,6 +1,6 @@
 # AI-Driven Sentiment Analysis for Laravel Feedback
 
-This project demonstrates a real-time sentiment analysis workflow for user feedback in a Laravel application, using **Make.com** and the **Hugging Face Inference API**.
+This project demonstrates a sentiment analysis workflow for user feedback in a Laravel application, using **Make.com** and the **Hugging Face Inference API**.
 
 -----
 
